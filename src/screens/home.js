@@ -8,6 +8,7 @@ import { save } from '../utils/storage.js';
 import { nextLevelId, totals, dailyRecord } from '../game/progress.js';
 import { dateKey } from '../levels/index.js';
 import { sfx } from '../audio/sound.js';
+import { showHowTo } from '../components/howto.js';
 
 export function create(app) {
   const next = nextLevelId();
@@ -60,6 +61,8 @@ export function create(app) {
   });
   const settingsBtn = btn({ cls: 'round-btn glass', ico: 'settings', label: 'SETTINGS', onClick: () => app.go('settings') });
 
+  const helpBtn = btn({ cls: 'round-btn glass', ico: 'help', aria: 'How to play', icoSize: 22, onClick: () => showHowTo() });
+
   const el = h(
     'section',
     { class: 'home' },
@@ -68,7 +71,7 @@ export function create(app) {
     h('div', { class: 'orb-wrap stagger' }, orb),
     h('div', { class: 'home-play stagger' }, play, progress, bar),
     h('div', { class: 'stagger' }, modes),
-    h('div', { class: 'home-bottom stagger' }, soundBtn, settingsBtn),
+    h('div', { class: 'home-bottom stagger' }, soundBtn, helpBtn, settingsBtn),
   );
 
   let raf = 0;

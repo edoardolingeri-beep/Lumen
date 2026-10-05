@@ -7,7 +7,7 @@ import { Board } from '../components/board.js';
 import { MelodyBar } from '../components/melodyBar.js';
 import { noteColor, tileColor } from '../components/tile.js';
 import { getLevel, getDailyLevel, TOTAL_LEVELS } from '../levels/index.js';
-import { applyMove, cloneState, evaluate, resolveDrop, tileNotes } from '../game/model.js';
+import { applyMove, cloneState, evaluate, readingOrder, resolveDrop, tileNotes } from '../game/model.js';
 import { getHint } from '../game/hints.js';
 import { starsFor, recordLevel, recordDaily, hintStatus, useHint, isWorldUnlocked } from '../game/progress.js';
 import { MECHANICS } from '../data/mechanics.js';
@@ -18,6 +18,7 @@ import { haptics } from '../utils/haptics.js';
 import { save } from '../utils/storage.js';
 import { prefs } from '../components/prefs.js';
 import { showWorldComplete } from './worldComplete.js';
+import { showHowTo, orderGrid, ARROWS } from '../components/howto.js';
 
 const FEEDBACK = {
   near: ['Almost there.', 'So close. Listen again.'],
@@ -73,17 +74,31 @@ export function create(app, params) {
   melody.set(L.target);
 
   const chips = h('div', { class: 'chips' });
-  const chipList = L.mechanics.filter((m) => MECHANICS[m]);
-  chipList.forEach((m) => {
-    const mech = MECHANICS[m];
-    const label = m === 'mirror' ? '← Mirror' : m === 'reverse' ? '↺ Reverse' : mech.short;
-    const c = h('button', { class: `chip chip-${m}`, type: 'button' }, label);
-    c.addEventListener('click', () => {
-      sfx('button');
-      toast(mech.text, 3200);
-    });
-    chips.append(c);
+  const readMode = L.read || 'normal';
+  const READ_TEXT = {
+    normal: 'Read left to right, then the next row down.',
+    mirror: 'Mirror: read right to left, then the next row down.',
+    reverse: 'Reverse: start at the bottom right, read right to left, going up.',
+  };
+  const readLabel = { normal: 'Read order', mirror: 'Mirror', reverse: 'Reverse' }[readMode];
+  const readChip = h('button', { class: `chip chip-read chip-${readMode}`, type: 'button' }, `${ARROWS[readMode]}  ${readLabel}`);
+  readChip.addEventListener('click', () => {
+    sfx('button');
+    sweepOrder();
+    toast(READ_TEXT[readMode], 3200);
   });
+  chips.append(readChip);
+  L.mechanics
+    .filter((m) => MECHANICS[m] && m !== 'mirror' && m !== 'reverse')
+    .forEach((m) => {
+      const mech = MECHANICS[m];
+      const c = h('button', { class: `chip chip-${m}`, type: 'button' }, mech.short);
+      c.addEventListener('click', () => {
+        sfx('button');
+        toast(mech.text, 3200);
+      });
+      chips.append(c);
+    });
 
   const boardArea = h('div', { class: 'board-area' });
   const coach = h('div', { class: 'coach', 'aria-live': 'polite' });
@@ -265,6 +280,11 @@ export function create(app, params) {
     feedback.textContent = text;
     void feedback.offsetWidth;
     feedback.classList.add('show');
+  }
+
+  /** Light every cell once, in reading order. */
+  function sweepOrder() {
+    readingOrder(L).forEach((c, i) => later(() => board.lightCell(c, 300), i * 70));
   }
 
   function stopPlayback() {
@@ -497,6 +517,7 @@ export function create(app, params) {
         h('h2', { class: 'pause-title' }, 'PAUSED'),
         btn({ cls: 'primary wide', ico: 'play', label: 'RESUME', onClick: () => o.close() }),
         btn({ cls: 'glass wide', ico: 'reset', label: 'RESTART', onClick: () => { o.close(); reset(); } }),
+        btn({ cls: 'glass wide', ico: 'help', label: 'HOW TO PLAY', onClick: () => { o.close(); showHowTo(); } }),
         btn({
           cls: 'glass wide',
           ico: 'settings',
@@ -579,13 +600,19 @@ export function create(app, params) {
       cls: 'intro',
       children: [
         h('div', { class: 'intro-new' }, 'NEW'),
-        h('div', { class: `intro-visual iv-${mech}` }, h('span'), h('span'), h('span')),
+        mech === 'mirror' || mech === 'reverse' ? orderGrid(mech, 3, 3) : h('div', { class: `intro-visual iv-${mech}` }, h('span'), h('span'), h('span')),
         h('h2', { class: 'intro-title' }, m.name.toUpperCase()),
         h('p', { class: 'intro-text' }, m.text),
         btn({ cls: 'primary wide', label: 'GOT IT', sound: 'select', onClick: () => o.close() }),
       ],
+      onClose: () => (mech === 'mirror' || mech === 'reverse') && later(sweepOrder, 250),
     });
     save.update((d) => d.seen.intros.push(mech));
+  }
+
+  function openHowToFirst() {
+    save.update((d) => d.seen.intros.push('howto'));
+    showHowTo({ onClose: () => later(startTutorial, 300) });
   }
 
   // ------------------------------------------------------------- lifecycle
@@ -599,7 +626,7 @@ export function create(app, params) {
         update();
         lastRatio = evaluate(L, S).ratio;
         if (!resume) {
-          if (L.tutorial === 'first') later(startTutorial, 700);
+          if (L.tutorial === 'first') later(save.data.seen.intros.includes('howto') ? startTutorial : openHowToFirst, 700);
           else if (L.intro && !save.data.seen.intros.includes(L.intro)) later(() => showIntro(L.intro), 500);
           else if (L.tutorial === 'reading') {
             later(() => {

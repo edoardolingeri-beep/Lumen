@@ -5,6 +5,7 @@ import { btn, topBar, confirmDialog, toast } from '../components/ui.js';
 import { save } from '../utils/storage.js';
 import { sfx, playNote } from '../audio/sound.js';
 import { haptics } from '../utils/haptics.js';
+import { showHowTo } from '../components/howto.js';
 
 export function create(app) {
   const s = () => save.data.settings;
@@ -87,6 +88,7 @@ export function create(app) {
         toggle('colorMode', 'Color mode', 'Colour-blind friendly palette', 'NORMAL', 'COLOR BLIND', ['normal', 'colorblind']),
         toggle('noteNames', 'Note names', 'Solfège or letters', 'DO RE MI', 'C D E', ['solfege', 'letters']),
       ),
+      h('div', { class: 'group glass stagger' }, h('div', { class: 'group-title' }, 'Help'), h('div', { class: 'setting' }, h('div', { class: 'setting-text' }, h('span', { class: 'setting-name' }, 'How to play'), h('span', { class: 'setting-desc' }, 'Reading order and the basics')), btn({ cls: 'small-btn', label: 'OPEN', onClick: () => showHowTo() }))),
       h('div', { class: 'group glass stagger' }, h('div', { class: 'group-title' }, 'Progress'), h('div', { class: 'setting' }, h('div', { class: 'setting-text' }, h('span', { class: 'setting-name' }, 'Reset progress'), h('span', { class: 'setting-desc' }, 'Start the journey again')), resetBtn)),
       h('p', { class: 'about stagger' }, 'LUMEN · a musical puzzle · v1.0', h('br'), 'Saved automatically on this device. Works offline.'),
     ),

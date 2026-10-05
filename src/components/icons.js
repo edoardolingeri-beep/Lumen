@@ -27,6 +27,7 @@ const P = {
   sky: '<path d="M18.5 14.5A7 7 0 0 1 9.5 5.5a7 7 0 1 0 9 9z"/><path d="M17 3.5v3M15.5 5h3"/>',
   trash: '<path d="M5 7h14M10 7V5h4v2M7 7l1 12.5h8L17 7"/>',
   loop: '<path d="M17 7H8a4 4 0 0 0 0 8h1"/><path d="m14.5 4.5 2.5 2.5-2.5 2.5"/><path d="M7 17h9a4 4 0 0 0 0-8h-1"/>',
+  help: '<circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.6a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.2 1-1.2 1.9"/><circle cx="12" cy="16.8" r=".6" fill="currentColor"/>',
   listen: '<path d="M4 13v-1a8 8 0 0 1 16 0v1"/><rect x="3.5" y="13" width="4" height="6.5" rx="1.5"/><rect x="16.5" y="13" width="4" height="6.5" rx="1.5"/>',
 };
 

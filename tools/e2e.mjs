@@ -124,8 +124,12 @@ async function solveCurrent(page) {
   await page.click('.play-btn');
   await waitScreen(page, 'game');
   log((await page.textContent('.screen-game .screen-title')) === 'LEVEL 01', 'PLAY opens LEVEL 01');
-  await page.waitForTimeout(900);
+  await page.waitForSelector('.howto', { timeout: 5000 });
+  log(await page.isVisible('.howto'), 'how-to-play guide opens on first launch');
+  await page.click('.howto .btn.ghost');
+  await page.waitForTimeout(1400);
   log(await page.isVisible('.coach.show'), 'tutorial coach visible ("Tap a note")');
+  log(await page.isVisible('.chip-read'), 'reading-order chip visible');
 
   // Tap a note.
   const tile0 = await page.evaluate(() => {

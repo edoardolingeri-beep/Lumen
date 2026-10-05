@@ -21,6 +21,10 @@ class AudioEngine {
     if (this.ctx) return this.ctx;
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return null;
+    // iOS: play through the media channel so the silent switch does not mute the game.
+    try {
+      if (navigator.audioSession) navigator.audioSession.type = 'playback';
+    } catch (e) {}
     const ctx = new AC({ latencyHint: 'interactive' });
     this.ctx = ctx;
 
