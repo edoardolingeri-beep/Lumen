@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>LUMEN — a musical puzzle</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <meta name="description" content="LUMEN is a relaxing musical puzzle game. Arrange glowing notes to create gentle melodies." />
+    <meta name="theme-color" content="#050a1e" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="LUMEN" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
+    <link rel="preload" href="assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="src/styles/base.css" />
+    <link rel="stylesheet" href="src/styles/screens.css" />
+    <link rel="stylesheet" href="src/styles/game.css" />
+    <style>
+      /* Splash shown before scripts run */
+      #boot {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle at 50% 40%, #13224f, #050a1e 70%);
+        color: #eef1ff;
+        font: 300 40px/1 'Manrope', -apple-system, sans-serif;
+        letter-spacing: 0.52em;
+        z-index: 50;
+        transition: opacity 0.8s ease;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="sky" aria-hidden="true"></canvas>
+    <main id="app"></main>
+    <div id="overlays"></div>
+    <div id="boot" aria-hidden="true">LUMEN</div>
+    <noscript>
+      <p style="position: fixed; bottom: 20px; width: 100%; text-align: center; color: #aab">LUMEN needs JavaScript to play.</p>
+    </noscript>
+    <script type="module">
+      import './src/main.js';
+      const boot = document.getElementById('boot');
+      boot.style.opacity = '0';
+      setTimeout(() => boot.remove(), 900);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "lumen",
+  "version": "1.0.0",
+  "description": "LUMEN — a relaxing musical puzzle game for the mobile web.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "npx --yes serve -l 5173 .",
+    "validate": "node tools/validate-levels.mjs",
+    "precache": "node tools/gen-precache.mjs",
+    "test": "node tools/validate-levels.mjs --no-search && node tools/e2e.mjs"
+  },
+  "license": "MIT"
+}
